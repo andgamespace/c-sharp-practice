@@ -1,0 +1,21 @@
+<Application xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="TodoList.App"
+             xmlns:local="using:TodoList"
+             xmlns:converters="using:TodoList.Converters"
+             RequestedThemeVariant="Light">
+             
+    <Application.DataTemplates>
+        <local:ViewLocator/>
+    </Application.DataTemplates>
+  
+    <Application.Styles>
+        <FluentTheme />
+    </Application.Styles>
+    
+    <Application.Resources>
+        <!-- Converters -->
+        <converters:BoolToStrikethroughConverter x:Key="BoolToStrikethroughConverter"/>
+        <converters:PriorityToBrushConverter x:Key="PriorityToBrushConverter"/>
+    </Application.Resources>
+</Application>

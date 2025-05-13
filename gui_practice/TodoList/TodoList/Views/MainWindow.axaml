@@ -1,0 +1,148 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:TodoList.ViewModels"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:converters="using:TodoList.Converters"
+        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="600"
+        x:Class="TodoList.Views.MainWindow"
+        x:DataType="vm:MainWindowViewModel"
+        Icon="/Assets/avalonia-logo.ico"
+        Title="TodoList App"
+        Background="#f5f5f5">
+
+    <Window.Resources>
+        <converters:BoolToStringConverter x:Key="BoolToStringConverter"/>
+    </Window.Resources>
+
+    <Design.DataContext>
+        <vm:MainWindowViewModel/>
+    </Design.DataContext>
+
+    <Grid RowDefinitions="Auto,*">
+        <!-- Header -->
+        <Border Grid.Row="0" Background="#4a6da7" Padding="20,15" BoxShadow="0 1 10 0 #10000000">
+            <StackPanel Orientation="Horizontal">
+                <TextBlock Text="TodoList" FontSize="24" FontWeight="Bold" Foreground="White" VerticalAlignment="Center"/>
+                <Button Content="+" 
+                        Command="{Binding AddNewTaskCommand}" 
+                        Background="#73a1f7"
+                        Foreground="White"
+                        FontSize="18"
+                        Width="40" 
+                        Height="40" 
+                        Margin="20,0,0,0"
+                        HorizontalContentAlignment="Center"
+                        VerticalContentAlignment="Center"
+                        CornerRadius="20"/>
+            </StackPanel>
+        </Border>
+
+        <!-- Main Content -->
+        <Grid Grid.Row="1" ColumnDefinitions="3*,2*" Margin="0,10,0,0">
+            <!-- Left Panel - Task List -->
+            <Grid Grid.Column="0" RowDefinitions="Auto,*" Margin="10,0,5,10">
+                <!-- Filter Controls -->
+                <Border Grid.Row="0" Background="White" Padding="10" Margin="0,0,0,10" CornerRadius="5" BoxShadow="0 1 5 0 #10000000">
+                    <StackPanel>
+                        <TextBox Text="{Binding FilterText}" Watermark="Search tasks..." Margin="0,0,0,10"/>
+                        <Grid ColumnDefinitions="*,*">
+                            <ComboBox Grid.Column="0" SelectedIndex="{Binding SelectedPriorityFilter}" Width="200" Margin="0,0,10,0">
+                                <ComboBoxItem Content="All Priorities"/>
+                                <ComboBoxItem Content="Low"/>
+                                <ComboBoxItem Content="Normal"/>
+                                <ComboBoxItem Content="High"/>
+                            </ComboBox>
+                            <CheckBox Grid.Column="1" Content="Show Completed" IsChecked="{Binding ShowCompletedTasks}" VerticalAlignment="Center"/>
+                        </Grid>
+                    </StackPanel>
+                </Border>
+                
+                <!-- Task List -->
+                <Border Grid.Row="1" Background="White" Padding="10" CornerRadius="5" BoxShadow="0 1 5 0 #10000000">
+                    <ScrollViewer>
+                        <ItemsControl ItemsSource="{Binding FilteredTasks}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate x:DataType="vm:TaskViewModel">
+                                    <Border Margin="0,5" Padding="10" Background="#f9f9f9" CornerRadius="5" BoxShadow="0 1 3 0 #10000000">
+                                        <Grid ColumnDefinitions="Auto,*,Auto">
+                                            <CheckBox Grid.Column="0" IsChecked="{Binding IsCompleted}" 
+                                                      Command="{Binding ((vm:MainWindowViewModel)DataContext).ToggleTaskCompletionCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}" 
+                                                      CommandParameter="{Binding}" 
+                                                      VerticalAlignment="Center"/>
+                                            <StackPanel Grid.Column="1" Margin="10,0">
+                                                <TextBlock Text="{Binding Title}" FontWeight="SemiBold"
+                                                         TextDecorations="{Binding IsCompleted, Converter={StaticResource BoolToStrikethroughConverter}}"/>
+                                                <TextBlock Text="{Binding Description}" FontSize="12" Opacity="0.7" TextWrapping="Wrap"/>
+                                                <StackPanel Orientation="Horizontal" Margin="0,5,0,0" Spacing="10">
+                                                    <Border Background="{Binding Priority, Converter={StaticResource PriorityToBrushConverter}}" CornerRadius="3" Padding="5,2">
+                                                        <TextBlock Text="{Binding Priority}" FontSize="10" Foreground="White"/>
+                                                    </Border>
+                                                    <TextBlock Text="{Binding DueDate, StringFormat='{}{0:MMM dd, yyyy}'}" FontSize="10" Opacity="0.7" VerticalAlignment="Center"/>
+                                                </StackPanel>
+                                            </StackPanel>
+                                            <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="5">
+                                                <Button Content="✎" 
+                                                        Command="{Binding ((vm:MainWindowViewModel)DataContext).EditTaskCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}" 
+                                                        CommandParameter="{Binding}" 
+                                                        Width="30" Height="30" CornerRadius="15" 
+                                                        Background="#4a6da7" Foreground="White"/>
+                                                <Button Content="✕" 
+                                                        Command="{Binding ((vm:MainWindowViewModel)DataContext).DeleteTaskCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}" 
+                                                        CommandParameter="{Binding}" 
+                                                        Width="30" Height="30" CornerRadius="15" 
+                                                        Background="#e74c3c" Foreground="White"/>
+                                            </StackPanel>
+                                        </Grid>
+                                    </Border>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </ScrollViewer>
+                </Border>
+            </Grid>
+
+            <!-- Right Panel - Task Form -->
+            <Border Grid.Column="1" Background="White" Margin="5,0,10,10" Padding="15" IsVisible="{Binding IsTaskFormVisible}" CornerRadius="5" BoxShadow="0 1 5 0 #10000000">
+                <Grid RowDefinitions="Auto,*,Auto">
+                    <TextBlock Grid.Row="0" Text="{Binding IsEditMode, Converter={StaticResource BoolToStringConverter}, ConverterParameter='Edit Task|Add New Task'}" FontSize="18" FontWeight="Bold" Margin="0,0,0,15"/>
+                    
+                    <ScrollViewer Grid.Row="1">
+                        <StackPanel Spacing="15">
+                            <StackPanel>
+                                <TextBlock Text="Title" Margin="0,0,0,5"/>
+                                <TextBox Text="{Binding NewTask.Title}" Watermark="Enter task title..."/>
+                            </StackPanel>
+                            
+                            <StackPanel>
+                                <TextBlock Text="Description" Margin="0,0,0,5"/>
+                                <TextBox Text="{Binding NewTask.Description}" Watermark="Enter task description..." AcceptsReturn="True" TextWrapping="Wrap" Height="100"/>
+                            </StackPanel>
+                            
+                            <StackPanel>
+                                <TextBlock Text="Due Date" Margin="0,0,0,5"/>
+                                <DatePicker SelectedDate="{Binding NewTask.DueDate}"/>
+                            </StackPanel>
+                            
+                            <StackPanel>
+                                <TextBlock Text="Priority" Margin="0,0,0,5"/>
+                                <ComboBox SelectedIndex="{Binding NewTask.Priority}" Width="200">
+                                    <ComboBoxItem Content="Low"/>
+                                    <ComboBoxItem Content="Normal"/>
+                                    <ComboBoxItem Content="High"/>
+                                </ComboBox>
+                            </StackPanel>
+                            
+                            <CheckBox Content="Mark as completed" IsChecked="{Binding NewTask.IsCompleted}"/>
+                        </StackPanel>
+                    </ScrollViewer>
+                    
+                    <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,15,0,0" Spacing="10">
+                        <Button Content="Cancel" Command="{Binding CancelEditCommand}" Width="100" Background="#e0e0e0"/>
+                        <Button Content="Save" Command="{Binding SaveTaskCommand}" Width="100" Background="#4CAF50" Foreground="White"/>
+                    </StackPanel>
+                </Grid>
+            </Border>
+        </Grid>
+    </Grid>
+</Window>
