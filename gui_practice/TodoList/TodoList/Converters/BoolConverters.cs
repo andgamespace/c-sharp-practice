@@ -6,10 +6,10 @@ namespace TodoList.Converters
 {
     public static class BoolConverters
     {
-        public static readonly IValueConverter ToString = new BoolToStringConverter();
+        public static readonly IValueConverter BoolToSwitchableString = new BoolToSwitchableStringConverter();
     }
 
-    public class BoolToStringConverter : IValueConverter
+    public class BoolToSwitchableStringConverter : IValueConverter
     {
         public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
         {

@@ -23,11 +23,6 @@ public class TaskService
         return await _context.Tasks.ToListAsync();
     }
 
-    public async System.Threading.Tasks.Task<TodoList.Models.Task?> GetTaskAsync(int id)
-    {
-        return await _context.Tasks.FindAsync(id);
-    }
-
     public async System.Threading.Tasks.Task<TodoList.Models.Task?> GetTaskByIdAsync(int id)
     {
         return await _context.Tasks.FindAsync(id);

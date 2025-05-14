@@ -12,7 +12,7 @@
         Background="#f5f5f5">
 
     <Window.Resources>
-        <converters:BoolToStringConverter x:Key="BoolToStringConverter"/>
+        <converters:BoolToSwitchableStringConverter x:Key="BoolToSwitchableStringConverter"/>
     </Window.Resources>
 
     <Design.DataContext>
@@ -21,20 +21,31 @@
 
     <Grid RowDefinitions="Auto,*">
         <!-- Header -->
-        <Border Grid.Row="0" Background="#4a6da7" Padding="20,15" BoxShadow="0 1 10 0 #10000000">
+        <Border Grid.Row="0" Background="#333333" Padding="15,12" BoxShadow="0 2 8 0 #10000000">
             <StackPanel Orientation="Horizontal">
-                <TextBlock Text="TodoList" FontSize="24" FontWeight="Bold" Foreground="White" VerticalAlignment="Center"/>
-                <Button Content="+" 
+                <TextBlock Text="TodoList" FontSize="22" FontWeight="SemiBold" Foreground="#E0E0E0" VerticalAlignment="Center"/>
+                <Button Content="➕" 
                         Command="{Binding AddNewTaskCommand}" 
-                        Background="#73a1f7"
+                        Background="#007AFF" 
                         Foreground="White"
-                        FontSize="18"
-                        Width="40" 
-                        Height="40" 
+                        FontSize="16" 
+                        FontWeight="Bold"
+                        Width="36" 
+                        Height="36" 
                         Margin="20,0,0,0"
                         HorizontalContentAlignment="Center"
                         VerticalContentAlignment="Center"
-                        CornerRadius="20"/>
+                        CornerRadius="18" 
+                        ToolTip.Tip="Add New Task">
+                    <Button.Styles>
+                        <Style Selector="Button:pointerover">
+                            <Setter Property="Background" Value="#005BB5"/>
+                        </Style>
+                        <Style Selector="Button:pressed">
+                            <Setter Property="Background" Value="#004C99"/>
+                        </Style>
+                    </Button.Styles>
+                </Button>
             </StackPanel>
         </Border>
 
@@ -64,34 +75,50 @@
                         <ItemsControl ItemsSource="{Binding FilteredTasks}">
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate x:DataType="vm:TaskViewModel">
-                                    <Border Margin="0,5" Padding="10" Background="#f9f9f9" CornerRadius="5" BoxShadow="0 1 3 0 #10000000">
-                                        <Grid ColumnDefinitions="Auto,*,Auto">
+                                    <Border Margin="0,4,0,4" Padding="12,10" Background="#FFFFFF" CornerRadius="6" BoxShadow="0 1 3 0 #10000000">
+                                        <Grid ColumnDefinitions="Auto,*,Auto" VerticalAlignment="Center">
                                             <CheckBox Grid.Column="0" IsChecked="{Binding IsCompleted}" 
                                                       Command="{Binding ((vm:MainWindowViewModel)DataContext).ToggleTaskCompletionCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}" 
                                                       CommandParameter="{Binding}" 
-                                                      VerticalAlignment="Center"/>
-                                            <StackPanel Grid.Column="1" Margin="10,0">
-                                                <TextBlock Text="{Binding Title}" FontWeight="SemiBold"
-                                                         TextDecorations="{Binding IsCompleted, Converter={StaticResource BoolToStrikethroughConverter}}"/>
-                                                <TextBlock Text="{Binding Description}" FontSize="12" Opacity="0.7" TextWrapping="Wrap"/>
-                                                <StackPanel Orientation="Horizontal" Margin="0,5,0,0" Spacing="10">
-                                                    <Border Background="{Binding Priority, Converter={StaticResource PriorityToBrushConverter}}" CornerRadius="3" Padding="5,2">
-                                                        <TextBlock Text="{Binding Priority}" FontSize="10" Foreground="White"/>
-                                                    </Border>
-                                                    <TextBlock Text="{Binding DueDate, StringFormat='{}{0:MMM dd, yyyy}'}" FontSize="10" Opacity="0.7" VerticalAlignment="Center"/>
+                                                      VerticalAlignment="Center" Margin="0,0,8,0"/>
+                                            
+                                            <StackPanel Grid.Column="1" Margin="0,0,10,0" VerticalAlignment="Center">
+                                                <TextBlock Text="{Binding Title}" FontWeight="Medium" FontSize="15"
+                                                           TextDecorations="{Binding IsCompleted, Converter={StaticResource BoolToStrikethroughConverter}}"/>
+                                                <TextBlock Text="{Binding Description}" FontSize="13" Foreground="#555555" TextWrapping="Wrap" IsVisible="{Binding Description, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" Margin="0,2,0,0"/>
+                                                <StackPanel Orientation="Horizontal" Margin="0,6,0,0" Spacing="8" VerticalAlignment="Center">
+                                                    <Border Width="10" Height="10" CornerRadius="5" Background="{Binding Priority, Converter={StaticResource PriorityToBrushConverter}}" ToolTip.Tip="{Binding Priority}"/>
+                                                    <TextBlock Text="{Binding DueDate, StringFormat='{}{0:MMM dd}'}" FontSize="12" Foreground="#777777" VerticalAlignment="Center"/>
                                                 </StackPanel>
                                             </StackPanel>
-                                            <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="5">
-                                                <Button Content="✎" 
+
+                                            <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
+                                                <Button ToolTip.Tip="Edit Task"
                                                         Command="{Binding ((vm:MainWindowViewModel)DataContext).EditTaskCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}" 
                                                         CommandParameter="{Binding}" 
-                                                        Width="30" Height="30" CornerRadius="15" 
-                                                        Background="#4a6da7" Foreground="White"/>
-                                                <Button Content="✕" 
+                                                        Width="32" Height="32" CornerRadius="16" 
+                                                        Background="Transparent" Foreground="#555555">
+                                                    <PathIcon Data="M4,20 L4,20 L4,16 L14.5,5.5 C15.3,4.7 16.7,4.7 17.5,5.5 L18.5,6.5 C19.3,7.3 19.3,8.7 18.5,9.5 L8,20 Z M14,6.5 L17.5,10 M4,20 L8,20"/>
+                                                    <Button.Styles>
+                                                        <Style Selector="Button:pointerover">
+                                                            <Setter Property="Background" Value="#E0E0E0"/>
+                                                            <Setter Property="Foreground" Value="#222222"/>
+                                                        </Style>
+                                                    </Button.Styles>
+                                                </Button>
+                                                <Button ToolTip.Tip="Delete Task"
                                                         Command="{Binding ((vm:MainWindowViewModel)DataContext).DeleteTaskCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}" 
                                                         CommandParameter="{Binding}" 
-                                                        Width="30" Height="30" CornerRadius="15" 
-                                                        Background="#e74c3c" Foreground="White"/>
+                                                        Width="32" Height="32" CornerRadius="16" 
+                                                        Background="Transparent" Foreground="#555555">
+                                                    <PathIcon Data="M6,19 C6,20.1 6.9,21 8,21 L16,21 C17.1,21 18,20.1 18,19 L18,7 L6,7 Z M19,4 L15,4 L14,3 L10,3 L9,4 L5,4 L5,6 L19,6 Z"/>
+                                                    <Button.Styles>
+                                                        <Style Selector="Button:pointerover">
+                                                            <Setter Property="Background" Value="#E0E0E0"/>
+                                                            <Setter Property="Foreground" Value="#E74C3C"/>
+                                                        </Style>
+                                                    </Button.Styles>
+                                                </Button>
                                             </StackPanel>
                                         </Grid>
                                     </Border>
@@ -103,43 +130,63 @@
             </Grid>
 
             <!-- Right Panel - Task Form -->
-            <Border Grid.Column="1" Background="White" Margin="5,0,10,10" Padding="15" IsVisible="{Binding IsTaskFormVisible}" CornerRadius="5" BoxShadow="0 1 5 0 #10000000">
+            <Border Grid.Column="1" 
+                    Background="#FFFFFF" 
+                    Margin="5,0,10,10" 
+                    Padding="20" 
+                    IsVisible="{Binding IsTaskFormVisible}" 
+                    CornerRadius="8" 
+                    BoxShadow="0 2 10 0 #15000000">
                 <Grid RowDefinitions="Auto,*,Auto">
-                    <TextBlock Grid.Row="0" Text="{Binding IsEditMode, Converter={StaticResource BoolToStringConverter}, ConverterParameter='Edit Task|Add New Task'}" FontSize="18" FontWeight="Bold" Margin="0,0,0,15"/>
+                    <TextBlock Grid.Row="0" Text="{Binding IsEditMode, Converter={StaticResource BoolToSwitchableStringConverter}, ConverterParameter='Edit Task|Add New Task'}" FontSize="20" FontWeight="SemiBold" Margin="0,0,0,20" Foreground="#333333"/>
                     
-                    <ScrollViewer Grid.Row="1">
-                        <StackPanel Spacing="15">
-                            <StackPanel>
-                                <TextBlock Text="Title" Margin="0,0,0,5"/>
-                                <TextBox Text="{Binding NewTask.Title}" Watermark="Enter task title..."/>
+                    <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+                        <StackPanel Spacing="18">
+                            <StackPanel Spacing="6">
+                                <TextBlock Text="Title" Foreground="#444444" FontWeight="Medium"/>
+                                <TextBox Text="{Binding NewTask.Title}" Watermark="Enter task title..." Padding="10,8" CornerRadius="4" BorderThickness="1" BorderBrush="#DBDBDB"/>
                             </StackPanel>
                             
-                            <StackPanel>
-                                <TextBlock Text="Description" Margin="0,0,0,5"/>
-                                <TextBox Text="{Binding NewTask.Description}" Watermark="Enter task description..." AcceptsReturn="True" TextWrapping="Wrap" Height="100"/>
+                            <StackPanel Spacing="6">
+                                <TextBlock Text="Description" Foreground="#444444" FontWeight="Medium"/>
+                                <TextBox Text="{Binding NewTask.Description}" Watermark="Enter task description..." AcceptsReturn="True" TextWrapping="Wrap" Height="100" Padding="10,8" CornerRadius="4" BorderThickness="1" BorderBrush="#DBDBDB"/>
                             </StackPanel>
                             
-                            <StackPanel>
-                                <TextBlock Text="Due Date" Margin="0,0,0,5"/>
-                                <DatePicker SelectedDate="{Binding NewTask.DueDate}"/>
-                            </StackPanel>
+                            <Grid ColumnDefinitions="*,*">
+                                <StackPanel Grid.Column="0" Spacing="6">
+                                    <TextBlock Text="Due Date" Foreground="#444444" FontWeight="Medium"/>
+                                    <DatePicker SelectedDate="{Binding NewTask.DueDate}" Padding="10,8" CornerRadius="4" BorderThickness="1" BorderBrush="#DBDBDB" HorizontalAlignment="Left" MaxWidth="180"/>
+                                </StackPanel>
+                                
+                                <StackPanel Grid.Column="1" Spacing="6" Margin="10,0,0,0">
+                                    <TextBlock Text="Priority" Foreground="#444444" FontWeight="Medium"/>
+                                    <ComboBox SelectedIndex="{Binding NewTask.Priority}" Padding="10,8" CornerRadius="4" BorderThickness="1" BorderBrush="#DBDBDB" HorizontalAlignment="Left" MaxWidth="180">
+                                        <ComboBoxItem Content="Low"/>
+                                        <ComboBoxItem Content="Normal"/>
+                                        <ComboBoxItem Content="High"/>
+                                    </ComboBox>
+                                </StackPanel>
+                            </Grid>
                             
-                            <StackPanel>
-                                <TextBlock Text="Priority" Margin="0,0,0,5"/>
-                                <ComboBox SelectedIndex="{Binding NewTask.Priority}" Width="200">
-                                    <ComboBoxItem Content="Low"/>
-                                    <ComboBoxItem Content="Normal"/>
-                                    <ComboBoxItem Content="High"/>
-                                </ComboBox>
-                            </StackPanel>
-                            
-                            <CheckBox Content="Mark as completed" IsChecked="{Binding NewTask.IsCompleted}"/>
+                            <CheckBox Content="Mark as completed" IsChecked="{Binding NewTask.IsCompleted}" Foreground="#444444" Margin="0,5,0,0"/>
                         </StackPanel>
                     </ScrollViewer>
                     
-                    <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,15,0,0" Spacing="10">
-                        <Button Content="Cancel" Command="{Binding CancelEditCommand}" Width="100" Background="#e0e0e0"/>
-                        <Button Content="Save" Command="{Binding SaveTaskCommand}" Width="100" Background="#4CAF50" Foreground="White"/>
+                    <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,20,0,0" Spacing="12">
+                        <Button Content="Cancel" Command="{Binding CancelEditCommand}" Width="110" Height="38" Background="#E0E0E0" Foreground="#333333" CornerRadius="4" FontWeight="Medium">
+                            <Button.Styles>
+                                <Style Selector="Button:pointerover">
+                                    <Setter Property="Background" Value="#D0D0D0"/>
+                                </Style>
+                            </Button.Styles>
+                        </Button>
+                        <Button Content="Save" Command="{Binding SaveTaskCommand}" Width="110" Height="38" Background="#007AFF" Foreground="White" CornerRadius="4" FontWeight="Medium">
+                             <Button.Styles>
+                                <Style Selector="Button:pointerover">
+                                    <Setter Property="Background" Value="#005BB5"/>
+                                </Style>
+                            </Button.Styles>
+                        </Button>
                     </StackPanel>
                 </Grid>
             </Border>

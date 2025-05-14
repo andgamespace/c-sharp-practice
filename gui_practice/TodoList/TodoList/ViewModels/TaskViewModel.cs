@@ -10,7 +10,7 @@ public class TaskViewModel : ViewModelBase
     private int _id;
     private string _title = string.Empty;
     private string? _description;
-    private DateTime _dueDate;
+    private DateTimeOffset? _dueDate;
     private bool _isCompleted;
     private Priority _priority;
 
@@ -32,7 +32,7 @@ public class TaskViewModel : ViewModelBase
         set => this.RaiseAndSetIfChanged(ref _description, value);
     }
 
-    public DateTime DueDate
+    public DateTimeOffset? DueDate
     {
         get => _dueDate;
         set => this.RaiseAndSetIfChanged(ref _dueDate, value);
@@ -58,7 +58,7 @@ public class TaskViewModel : ViewModelBase
 
     public TaskViewModel()
     {
-        _dueDate = DateTime.Now.AddDays(1);
+        _dueDate = DateTimeOffset.Now.AddDays(1);
         CreatedAt = DateTime.Now;
         
         // Initialize the toggle command
@@ -75,7 +75,7 @@ public class TaskViewModel : ViewModelBase
         _id = task.Id;
         _title = task.Title;
         _description = task.Description;
-        _dueDate = task.DueDate;
+        _dueDate = new DateTimeOffset(task.DueDate);
         _isCompleted = task.IsCompleted;
         _priority = task.Priority;
         CreatedAt = task.CreatedAt;
@@ -97,7 +97,7 @@ public class TaskViewModel : ViewModelBase
             Id = Id,
             Title = Title,
             Description = Description,
-            DueDate = DueDate,
+            DueDate = _dueDate?.DateTime ?? DateTime.MinValue,
             IsCompleted = IsCompleted,
             Priority = Priority,
             CreatedAt = CreatedAt,
