@@ -6,7 +6,7 @@ using TodoList.Views;
 
 namespace TodoList;
 
-public class App : Application
+public partial class App : Application
 {
     public override void Initialize()
     {
