@@ -22,4 +22,12 @@ public class AppDbContext : DbContext
         DbPath = Path.Join(appDataPath, "todo.db");
         
     }
+
+    protected override void OnConfiguring(DbContextOptionsBuilder options)
+        => options.UseSqlite($"Data Source={DbPath}");
+
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<Task>().HasKey(t => t.ID);
+    }
 }
